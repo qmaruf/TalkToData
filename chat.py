@@ -16,17 +16,17 @@ openai.api_key  = os.environ['OPENAI_API_KEY']
 def upload_file(files):
     file_paths = [file.name for file in files]
     print (file_paths)
-    if file_paths.endswith(".pdf"):
-        loader = PDFLoader(file_paths)
-    else:
-        loader = TextLoader(file_paths)
-    document = loader.load()
+    # if file_paths.endswith(".pdf"):
+    #     loader = PDFLoader(file_paths)
+    # else:
+    #     loader = TextLoader(file_paths)
+    # document = loader.load()
 
-    text_splitter = get_text_splitter()
-    embedding = get_embedding()
-    splits = text_splitter.split_documents(document)
-    vectordb = get_vectordb(splits, embedding)
-    return vectordb
+    # text_splitter = get_text_splitter()
+    # embedding = get_embedding()
+    # splits = text_splitter.split_documents(document)
+    # vectordb = get_vectordb(splits, embedding)
+    # return vectordb
 
 
 def llm_interaction(message):
