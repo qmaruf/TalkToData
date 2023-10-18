@@ -27,5 +27,10 @@ streamlit run chat.py
 4. Upload a document through the app's sidebar.
 5. Start a conversation with the AI by sending a message.
 
+## Deploy to Hugging Face Spaces
+huggingface-cli login
+git remote add huggingface https://huggingface.co/spaces/qmaruf/talk-to-data
+
+
 ## Author
 Quazi Marufur Rahman | maruf.csdu@gmail.com
