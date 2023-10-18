@@ -1,8 +1,9 @@
+faiss-cpu==1.7.4
 langchain==0.0.273
 loguru==0.7.0
 openai==0.27.9
 pre-commit==3.5.0
 python-dotenv==1.0.0
 streamlit==1.27.2
-unstructured==0.10.22
 tiktoken==0.4.0
+unstructured==0.10.22
