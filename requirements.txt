@@ -1,5 +1,6 @@
 langchain==0.0.273
 loguru==0.7.0
 openai==0.27.9
+pre-commit==3.5.0
 python-dotenv==1.0.0
 streamlit==1.27.2
