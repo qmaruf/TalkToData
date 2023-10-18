@@ -15,7 +15,6 @@ from utils import get_qa_chain
 load_dotenv()
 
 openai.api_key = os.environ['OPENAI_API_KEY']
-Path('docs').mkdir(parents=True, exist_ok=True)
 
 if 'messages' not in st.session_state:
     st.session_state.messages = []
@@ -38,7 +37,7 @@ def set_status():
 def process_uploaded_file(uploaded_file):
     if 'context' not in st.session_state:
         logger.info(f'file uploaded {uploaded_file}')
-        upath = f'uploads/{uploaded_file.name}'
+        upath = f'docs/{uploaded_file.name}'
         logger.info(f'file saved to {upath}')
 
         with open(upath, 'wb') as hndl:

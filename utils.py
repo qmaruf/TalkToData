@@ -43,8 +43,8 @@ def create_vectordb(file_path):
 
     print('Splitting text...')
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1000,
-        chunk_overlap=100,
+        chunk_size=Config.chunk_size,
+        chunk_overlap=Config.chunk_overlap,
         length_function=len,
     )
     documents = text_splitter.split_documents(raw_documents)
