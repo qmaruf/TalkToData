@@ -40,9 +40,10 @@ streamlit run chat.py
 5. Start a conversation with the AI by sending a message.
 
 ## Deploy to Hugging Face Spaces
+```bash
 huggingface-cli login
 git remote add huggingface https://huggingface.co/spaces/qmaruf/talk-to-data
-
-
+git push huggingface main
+```
 ## Author
 Quazi Marufur Rahman | maruf.csdu@gmail.com
