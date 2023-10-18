@@ -1,21 +1,20 @@
 from __future__ import annotations
 
+import os
 import time
 from pathlib import Path
 
 import openai
 import streamlit as st
-from langchain.chat_models import ChatOpenAI
-from langchain.document_loaders import PyPDFLoader
-from langchain.document_loaders import TextLoader
-from langchain.prompts import PromptTemplate
+from dotenv import load_dotenv
 from loguru import logger
 
 from config import Config
 from utils import create_vectordb
 from utils import get_qa_chain
+load_dotenv()
 
-openai.api_key = st.secrets['OPENAI_API_KEY']
+openai.api_key = os.environ['OPENAI_API_KEY']
 Path('docs').mkdir(parents=True, exist_ok=True)
 
 if 'messages' not in st.session_state:
