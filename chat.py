@@ -1,53 +1,79 @@
-from langchain.document_loaders import TextLoader, PyPDFLoader
-import os
-import gradio as gr
-import random
+from __future__ import annotations
+
 import time
-from config import Config
-from loguru import logger
+from pathlib import Path
+
 import openai
-from utils import get_text_splitter, get_vectordb, get_embedding
-from dotenv import load_dotenv, find_dotenv
-_ = load_dotenv(find_dotenv())
+import streamlit as st
+from langchain.chat_models import ChatOpenAI
+from langchain.document_loaders import PyPDFLoader
+from langchain.document_loaders import TextLoader
+from langchain.prompts import PromptTemplate
+from loguru import logger
 
-openai.api_key  = os.environ['OPENAI_API_KEY']
+from config import Config
+from utils import create_vectordb
+from utils import get_qa_chain
 
+openai.api_key = st.secrets['OPENAI_API_KEY']
+Path('docs').mkdir(parents=True, exist_ok=True)
 
-def upload_file(files):
-    file_paths = [file.name for file in files]
-    print (file_paths)
-    # if file_paths.endswith(".pdf"):
-    #     loader = PDFLoader(file_paths)
-    # else:
-    #     loader = TextLoader(file_paths)
-    # document = loader.load()
+if 'messages' not in st.session_state:
+    st.session_state.messages = []
 
-    # text_splitter = get_text_splitter()
-    # embedding = get_embedding()
-    # splits = text_splitter.split_documents(document)
-    # vectordb = get_vectordb(splits, embedding)
-    # return vectordb
+for message in st.session_state.messages:
+    with st.chat_message(message['role']):
+        st.markdown(message['content'])
 
-
-def llm_interaction(message):
-    pass
+uploaded_file = st.sidebar.file_uploader('Upload a file', type=['pdf', 'txt'])
 
 
-with gr.Blocks() as demo:
-    file_output = gr.File()
-    upload_button = gr.UploadButton("Click to Upload a File", file_count="single")
-    upload_button.upload(upload_file, upload_button, file_output)
-    logger.info("File uploaded")
-    # logger.info(vectordb)
-    chatbot = gr.Chatbot()
-    msg = gr.Textbox()
+def set_status():
+    if uploaded_file is None:
+        Path(Config.vectorstore_path).unlink(missing_ok=True)
+        st.sidebar.info('Upoad a file to start a conversation')
+    else:
+        st.sidebar.info(f'Let"s talk to {Path(uploaded_file.name)}')
 
-    def respond(message, chat_history):
-        bot_message = random.choice(["How are you?", "I love you", "I'm very hungry"])
-        chat_history.append((message, bot_message))
-        time.sleep(2)
-        return "", chat_history
 
-    msg.submit(respond, [msg, chatbot], [msg, chatbot])
+def process_uploaded_file(uploaded_file):
+    if 'context' not in st.session_state:
+        logger.info(f'file uploaded {uploaded_file}')
+        upath = f'uploads/{uploaded_file.name}'
+        logger.info(f'file saved to {upath}')
 
-demo.launch()
+        with open(upath, 'wb') as hndl:
+            hndl.write(uploaded_file.getbuffer())
+
+        create_vectordb(upath)
+        st.session_state['context'] = True
+
+
+set_status()
+
+
+if uploaded_file is not None:
+    process_uploaded_file(uploaded_file)
+    qr_chain = get_qa_chain()
+
+    if prompt := st.chat_input('Send a message'):
+        st.session_state.messages.append({'role': 'user', 'content': prompt})
+        with st.chat_message('user'):
+            st.markdown(prompt)
+
+        with st.chat_message('assistant'):
+            message_placeholder = st.empty()
+            full_response = ''
+            assistant_response = qr_chain({'question': prompt})['answer']
+            logger.info(f'assistant response {assistant_response}')
+
+            for chunk in assistant_response.split():
+                full_response += chunk + ' '
+                time.sleep(0.01)
+
+                message_placeholder.markdown(full_response + '▌')
+            message_placeholder.markdown(full_response)
+
+        st.session_state.messages.append(
+            {'role': 'assistant', 'content': full_response},
+        )
