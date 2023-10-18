@@ -40,10 +40,21 @@ streamlit run chat.py
 5. Start a conversation with the AI by sending a message.
 
 ## Deploy to Hugging Face Spaces
+To deploy your chatbot to Hugging Face Space, first create a new streamlit space and copy the repo url to create a new remote repo with the name `huggingface`.
+
 ```bash
 huggingface-cli login
 git remote add huggingface https://huggingface.co/spaces/qmaruf/talk-to-data
-git push huggingface main
 ```
+Once done, you can push your code to Hugging Face and GitHub using
+
+```bash
+git push huggingface main
+git push origin main
+```
+
+Don't forget to name your application file as app.py as mentioned at the top of this file. It also contains the sdk name and version.
+
+
 ## Author
 Quazi Marufur Rahman | maruf.csdu@gmail.com
