@@ -7,3 +7,4 @@ python-dotenv==1.0.0
 streamlit==1.27.2
 tiktoken==0.4.0
 unstructured==0.10.22
+unstructured[pdf]
