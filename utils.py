@@ -75,8 +75,6 @@ def create_vectorstore(data):
 def load_url(url):
     loader = UnstructuredURLLoader(urls=[url])
     data = loader.load()
-    import pdb
-    pdb.set_trace()
     create_vectorstore(data)
 
 
