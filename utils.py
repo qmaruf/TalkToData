@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import os
 import pickle
 
+from dotenv import load_dotenv
 from langchain.chains import ConversationalRetrievalChain
 from langchain.chat_models import ChatOpenAI
 from langchain.document_loaders import UnstructuredFileLoader
@@ -16,19 +18,25 @@ from langchain.vectorstores.base import VectorStoreRetriever
 from langchain.vectorstores.faiss import FAISS
 
 from config import Config
+# from langchain.callbacks import ContextC÷allbackHandler
+
+load_dotenv()
+
+# context_callback = ContextCallbackHandler(os.environ['CONTEXT_API_KEY'])
 
 
 def get_prompt():
     """
     This function creates a prompt template that will be used to generate the prompt for the model.
     """
-    template = """Use the following pieces of context to answer the question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer. Ask follow up question if the user question is not clear. You must explain the reasoning behind your answer.
-    {context}
+    template = """Use the following pieces of context to answer the question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer.
+    ---
+    Context: {context}
     Question: {question}
     Answer:"""
     qa_prompt = PromptTemplate(
         template=template, input_variables=[
-            'question', 'context',
+            'question', 'context', 'chat_history',
         ],
     )
     return qa_prompt
@@ -64,7 +72,7 @@ def load_retriever():
     with open(Config.vectorstore_path, 'rb') as f:
         vectorstore = pickle.load(f)
     retriever = VectorStoreRetriever(
-        vectorstore=vectorstore, search_type='similarity',
+        vectorstore=vectorstore, search_type='mmr', search_kwargs={'k': 10},
     )
     return retriever
 
@@ -73,7 +81,10 @@ def get_qa_chain():
     """
     This function creates a question answering chain.
     """
-    llm = ChatOpenAI(model_name=Config.chatgpt_model_name, temperature=0)
+    llm = ChatOpenAI(
+        model_name=Config.chatgpt_model_name,
+        temperature=0,
+    )
     retriever = load_retriever()
     prompt = get_prompt()
     memory = ConversationBufferMemory(

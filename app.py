@@ -16,6 +16,7 @@ load_dotenv()
 
 openai.api_key = os.environ['OPENAI_API_KEY']
 
+
 if 'messages' not in st.session_state:
     st.session_state.messages = []
 
@@ -63,6 +64,7 @@ if uploaded_file is not None:
             message_placeholder = st.empty()
             full_response = ''
             assistant_response = qr_chain({'question': prompt})['answer']
+            logger.info(f'question {prompt}')
             logger.info(f'assistant response {assistant_response}')
 
             for chunk in assistant_response.split():
